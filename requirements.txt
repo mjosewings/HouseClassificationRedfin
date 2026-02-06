@@ -1,0 +1,10 @@
+# Python Requirements for House Classification Project
+
+# Data Collection
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+
+# Data Processing & ML
+pandas>=2.0.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
