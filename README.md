@@ -19,30 +19,56 @@ It includes key property features such as **sale price, sale date, property type
 * **Number of Records:** Variable; includes all listings across the selected ZIP codes
 * **Data Features:**
 
-| Feature        | Description                           |
-| -------------- | ------------------------------------- |
-| ZIP            | ZIP code of the property              |
-| Address        | Street address                        |
-| Sale Price     | Final sale price (USD)                |
-| Sale Date      | Date of sale (YYYY-MM-DD)             |
-| Property Type  | Single Family, Condo, Townhouse, etc. |
-| Beds           | Number of bedrooms                    |
-| Baths          | Number of bathrooms                   |
-| SqFt           | Living area in square feet            |
-| Year Built     | Year the property was built           |
-| Price per SqFt | Computed price per square foot        |
+| Feature        | Description                                  |
+| -------------- |----------------------------------------------|
+| ZIP            | ZIP code of the property                     |
+| Address        | Street address                               |
+| Sale Price     | Final sale price (USD)                       |
+| Sale Date      | Date of sale (YYYY-MM-DD)                    |
+| Property Type  | Single Family, Condo, Townhouse, etc.        |
+| Beds           | Number of bedrooms (1-6)                     |
+| Baths          | Number of bathrooms (1-5)                    |
+| SqFt           | Living area in square feet (500-4000)        |
+| Year Built     | Year the property was built                  |
+| Price per SqFt | Computed price per square foot ($100K-$2.3M) |
 
 ---
 
 ## **Project Structure**
 
 ```
-Redfin-House-Sales-4ZIPs/
+├── data/                      # All data files
+│   ├── house_data.csv        # Original data (300 records)
+│   ├── house_data_cleaned.csv
+│   ├── model_results.txt     # Performance metrics
+│   ├── test_predictions.csv  # For R visualizations
+│   ├── train_predictions.csv
+│   └── model_coefficients.csv
 │
-├── redfin_4zip_scraper.py        # Python scraper with pagination and cleaning
-├── redfin_4zip_dataset_clean.csv # Final cleaned dataset
-├── README.md                     # Project documentation
-└── requirements.txt              # Python dependencies
+├── visualizations/            # All plots
+│   ├── eda_plots.png
+│   ├── correlation_heatmap.png
+│   ├── confusion_matrix.png
+│   ├── feature_importance.png
+│   ├── performance_metrics.png
+│   └── price_per_sqft.png
+│
+├── data_collection.py         # Web scraping
+├── model_python.py            # ML model
+├── visualizations.R           # All plots 
+└── requirements.txt           # Python packages
+```
+
+---
+
+## 💻 Code Workflow
+
+```
+data_collection.py  →  data/house_data.csv
+         ↓
+model_python.py  →  data/*.csv, data/model_results.txt
+         ↓
+visualizations.R  →  visualizations/*.png
 ```
 
 ---
@@ -57,8 +83,6 @@ Redfin-House-Sales-4ZIPs/
 2. **Data Cleaning and Normalization:**
 
    * Numeric features (`Sale Price`, `Beds`, `Baths`, `SqFt`, `Year Built`) are converted and missing values handled.
-   * Missing dates are replaced with a placeholder (`1900-01-01`).
-   * Property types are standardized and missing entries replaced with `"Unknown"`.
    * `Price per SqFt` is calculated automatically.
 
 3. **Ethical Considerations:**
@@ -76,36 +100,20 @@ Redfin-House-Sales-4ZIPs/
 * `beautifulsoup4`
 * `pandas`
 
-Install dependencies using:
 
-```bash
-pip install -r requirements.txt
-```
+
 
 ---
 
-## **Usage**
+## 📊 Visualizations (R)
 
-1. **Scrape Data (Optional):**
+1. **EDA Plots** - Price, sqft, beds, baths distributions
+2. **Correlation Heatmap** - Feature relationships
+3. **Confusion Matrix** - Prediction errors
+4. **Feature Importance** - Model coefficients
+5. **Performance Metrics** - Precision, Recall, F1
+6. **Price per Sqft** - Market efficiency
 
-   ```bash
-   python redfin_4zip_scraper.py
-   ```
-
-   * Outputs a cleaned CSV (`redfin_4zip_dataset_clean.csv`).
-
-2. **Load Dataset in Python:**
-
-   ```python
-   import pandas as pd
-
-   df = pd.read_csv("redfin_4zip_dataset_clean.csv")
-   print(df.head())
-   ```
-
-3. **SQL Import (Optional):**
-
-   * The dataset can be loaded into MySQL, PostgreSQL, or SQLite for queries and analysis.
 
 ---
 
@@ -124,4 +132,58 @@ This project is for **educational and research purposes**. Data is scraped from 
 
 ---
 
+## 🤖 Model Results
 
+```
+Test Accuracy: 61.33%
+Training Accuracy: 70.22%
+Cross-Validation: 67.11% ± 15.24%
+```
+
+**Best Performance:** Manhattan (10001) - 80% F1  
+**Worst Performance:** NJ Suburban (07008) - 33% F1
+
+### Why Manhattan Works Well
+- High prices (+3.04 coefficient)
+- Small units (-4.12 sqft coefficient)
+- Unique urban signature
+
+### Why Suburbs Confuse
+- Similar price ranges
+- Similar house sizes
+- Missing geographic features
+
+---
+
+## 📈 Key Findings
+
+1. **Price** is most discriminative feature
+2. **Square footage** separates urban from suburban
+3. **61% accuracy** is 2.4× better than random (25%)
+4. Need location data (lat/lon) to improve further
+---
+
+## Confusion Matrix
+![confusion_matrix](visualizations/confusion_matrix.png)
+A heatmap visualizing the performance of a classification model with distinct zip codes.
+
+## Correlation Heatmap
+![correlation_heatmap](visualizations/correlation_heatmap.png)
+A heatmap visualizing the relationships between features.
+
+## Feature Importance
+![feature_importance](visualizations/feature_importance.png)
+A grouped bar chart visualizing the most important features in the model.
+
+## Price per SqFt
+![price_per_sqft](visualizations/price_per_sqft.png)
+A side-by-side comparison of the price per square foot across zip codes.
+
+
+## Performance Metrics
+![performance_metrics](visualizations/performance_metrics.png)
+A bar chart visualizing the performance of the model on each zip code, evaluated using precision, recall, and F1.
+
+## EDA Plots
+![eda_plots](visualizations/eda_plots.png)
+A six-panel visualization suite examining the relationship between price, square footage, bedrooms, bathrooms, and year built.
